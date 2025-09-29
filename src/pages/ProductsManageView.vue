@@ -3,18 +3,44 @@
     <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="bg-white rounded-xl shadow p-4 lg:col-span-2">
         <h1 class="text-xl font-semibold mb-4">Produk Saya</h1>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          <div v-for="p in products" :key="p.id" class="border rounded p-3">
+        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+          <input v-model="query" type="text" class="input-field sm:flex-1" placeholder="Cari nama produk..." />
+          <select v-model.number="perPage" class="input-field sm:w-48">
+            <option :value="8">8 / halaman</option>
+            <option :value="12">12 / halaman</option>
+            <option :value="24">24 / halaman</option>
+          </select>
+        </div>
+        <div v-if="paginatedProducts.length === 0" class="text-gray-600 p-6 text-center">Tidak ada produk yang cocok.</div>
+        <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div v-for="p in paginatedProducts" :key="p.id" class="border rounded p-3">
             <div class="aspect-square bg-gray-100 rounded mb-2 overflow-hidden">
               <img v-if="p.photos_product && p.photos_product.length" :src="resolveAssetUrl(p.photos_product[0].url)" class="w-full h-full object-cover" />
             </div>
             <div class="text-gray-900 font-medium line-clamp-2">{{ p.nama_produk }}</div>
             <div class="text-sm text-gray-600 mt-1">{{ formatIDR(Number(p.harga_konsumen || p.harga_reseller || 0)) }}</div>
-            <div class="mt-2 flex gap-2">
-              <button class="btn-secondary" @click="edit(p)">Edit</button>
-              <button class="text-red-600 text-sm" @click="del(p.id)">Hapus</button>
+            <div class="mt-3 space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <label class="text-xs text-gray-600">Stok</label>
+                <input v-model.number="p.stok" @change="updateStock(p)" type="number" class="input-field py-1 px-2 h-8 w-24" />
+              </div>
+              <div class="flex items-center justify-between gap-2">
+                <label class="text-xs text-gray-600">Aktif</label>
+                <button class="px-2 py-1 rounded text-xs" :class="p.is_active === false || p.status === 'INACTIVE' ? 'bg-gray-200 text-gray-700' : 'bg-green-100 text-green-700'" @click="toggleActive(p)">
+                  {{ (p.is_active === false || p.status === 'INACTIVE') ? 'Nonaktif' : 'Aktif' }}
+                </button>
+              </div>
+              <div class="flex gap-2 pt-1">
+                <button class="btn-secondary" @click="edit(p)">Edit</button>
+                <button class="text-red-600 text-sm" @click="del(p.id)">Hapus</button>
+              </div>
             </div>
           </div>
+        </div>
+        <div v-if="totalPages > 1" class="flex items-center justify-center gap-2 mt-4">
+          <button class="btn-secondary" :disabled="page===1" @click="page = page - 1">Sebelumnya</button>
+          <div class="text-sm text-gray-600">Halaman {{ page }} / {{ totalPages }}</div>
+          <button class="btn-secondary" :disabled="page===totalPages" @click="page = page + 1">Berikutnya</button>
         </div>
       </div>
       <div class="bg-white rounded-xl shadow p-4">
@@ -48,11 +74,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { apiService, resolveAssetUrl } from '@/services/api'
 import type { ProductItem } from '@/types/product'
 
 const products = ref<ProductItem[]>([])
+const query = ref('')
+const page = ref(1)
+const perPage = ref(8)
 const form = ref<any>({ id: null, nama_produk: '', harga_reseller: '', harga_konsumen: '', stok: 0, deskripsi: '', id_toko: 0, id_category: 0 })
 const categories = ref<any[]>([])
 const photoFile = ref<File | null>(null)
@@ -74,6 +103,7 @@ const load = async () => {
   } catch {
     products.value = Array.isArray(res.data) ? res.data : []
   }
+  page.value = 1
 }
 
 const edit = (p: ProductItem) => {
@@ -122,6 +152,7 @@ const submit = async () => {
 }
 
 const del = async (id: number) => {
+  if (!confirm('Hapus produk ini? Tindakan tidak dapat dibatalkan.')) return
   await apiService.deleteProduct(id)
   await load()
 }
@@ -134,6 +165,32 @@ const onSelectPhoto = (e: Event) => {
 }
 
 onMounted(load)
+
+const filteredProducts = computed(() => {
+  const q = query.value.trim().toLowerCase()
+  if (!q) return products.value
+  return products.value.filter((p: any) => (p.nama_produk || '').toString().toLowerCase().includes(q))
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredProducts.value.length / perPage.value)))
+const paginatedProducts = computed(() => {
+  const start = (page.value - 1) * perPage.value
+  return filteredProducts.value.slice(start, start + perPage.value)
+})
+
+const updateStock = async (p: any) => {
+  if (!p || !p.id) return
+  await apiService.updateProduct(p.id, { stok: Number(p.stok) })
+}
+
+const toggleActive = async (p: any) => {
+  if (!p || !p.id) return
+  const isInactive = p.is_active === false || p.status === 'INACTIVE'
+  const nextActive = !isInactive
+  await apiService.updateProduct(p.id, { is_active: nextActive, status: nextActive ? 'ACTIVE' : 'INACTIVE' })
+  p.is_active = nextActive
+  p.status = nextActive ? 'ACTIVE' : 'INACTIVE'
+}
 </script>
 
 <style scoped>
