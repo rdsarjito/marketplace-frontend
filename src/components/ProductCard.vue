@@ -19,13 +19,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { ProductItem } from '@/types/product'
 import { useCartStore } from '@/store/cart'
+import { resolveAssetUrl } from '@/services/api'
 
 const props = defineProps<{ product: ProductItem }>()
 
-const imageUrl = computed(() => props.product.photos_product?.[0]?.url || '')
+const fallback = ''
+const imageUrl = computed(() => {
+  const raw = props.product.photos_product?.[0]?.url || ''
+  return resolveAssetUrl(raw)
+})
 
 const formattedPrice = computed(() => {
   const raw = props.product.harga_konsumen || props.product.harga_reseller || '0'

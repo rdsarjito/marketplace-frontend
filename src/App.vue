@@ -4,6 +4,8 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         <RouterLink to="/products" class="text-primary-600 font-semibold">Evermos</RouterLink>
         <div class="flex items-center gap-4">
+          <RouterLink to="/profile" class="text-gray-700 hover:text-primary-600">Profil</RouterLink>
+          <RouterLink to="/my-products" class="text-gray-700 hover:text-primary-600">Produk Saya</RouterLink>
           <RouterLink to="/orders" class="text-gray-700 hover:text-primary-600">Pesanan</RouterLink>
           <RouterLink to="/cart" class="relative inline-flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-700">

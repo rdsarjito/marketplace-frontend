@@ -9,6 +9,8 @@ import CartView from '@/pages/CartView.vue'
 import CheckoutView from '@/pages/CheckoutView.vue'
 import OrdersView from '@/pages/OrdersView.vue'
 import OrderDetailView from '@/pages/OrderDetailView.vue'
+import ProfileView from '@/pages/ProfileView.vue'
+import ProductsManageView from '@/pages/ProductsManageView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,6 +18,18 @@ const router = createRouter({
     {
       path: '/',
       redirect: '/login'
+    },
+    {
+      path: '/my-products',
+      name: 'my-products',
+      component: ProductsManageView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfileView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/login',

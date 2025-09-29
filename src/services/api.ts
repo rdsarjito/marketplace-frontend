@@ -1,7 +1,15 @@
 import type { ApiResponse, AuthResponse, LoginRequest, RegisterRequest } from '@/types/auth'
 import type { ProductItem } from '@/types/product'
 
-const API_BASE_URL = 'http://127.0.0.1:8080/api/v1'
+export const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://127.0.0.1:8080/api/v1'
+export const API_ORIGIN = API_BASE_URL.split('/api/')[0]
+
+export function resolveAssetUrl(path?: string): string {
+  if (!path) return ''
+  if (path.startsWith('http')) return path
+  if (path.startsWith('/')) return `${API_ORIGIN}${path}`
+  return `${API_ORIGIN}/${path}`
+}
 
 class ApiService {
   private baseURL: string
@@ -68,6 +76,20 @@ class ApiService {
     return this.request('/user')
   }
 
+  async updateUserProfile(payload: {
+    nama?: string
+    no_telp?: string
+    tanggal_lahir?: string
+    jenis_kelamin?: 'L'|'P'
+    tentang?: string
+    pekerjaan?: string
+  }): Promise<ApiResponse<any>> {
+    return this.request('/user', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    })
+  }
+
   // Product endpoints
   async getProducts(params?: { page?: number; page_size?: number; q?: string; category_id?: string }): Promise<ApiResponse<ProductItem[]>> {
     const search = new URLSearchParams()
@@ -88,12 +110,82 @@ class ApiService {
     return this.request<ProductItem>(`/product/${idOrSlug}`)
   }
 
+  async getMyShop(): Promise<ApiResponse<any>> {
+    return this.request('/toko/my')
+  }
+
+  async uploadProductPhoto(productId: number | string, file: File): Promise<ApiResponse<ProductItem>> {
+    const form = new FormData()
+    form.append('file', file)
+    const endpoint = `/product/${productId}/photo`
+    const url = `${this.baseURL}${endpoint}`
+    const headers: Record<string, string> = {}
+    const token = localStorage.getItem('token')
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(url, { method: 'POST', body: form, headers })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Upload failed')
+    return data
+  }
+
+  async createProduct(payload: {
+    nama_produk: string
+    harga_reseller: string
+    harga_konsumen: string
+    stok: number
+    deskripsi: string
+    id_toko: number
+    id_category: number
+  }): Promise<ApiResponse<ProductItem>> {
+    return this.request<ProductItem>('/product', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async updateProduct(id: number | string, payload: {
+    nama_produk: string
+    harga_reseller: string
+    harga_konsumen: string
+    stok: number
+    deskripsi: string
+    id_category: number
+  }): Promise<ApiResponse<ProductItem>> {
+    return this.request<ProductItem>(`/product/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async deleteProduct(id: number | string): Promise<ApiResponse<any>> {
+    return this.request(`/product/${id}`, { method: 'DELETE' })
+  }
+
   // Address (protected)
   async createAddress(payload: { judul_alamat: string; nama_penerima: string; no_telp: string; detail_alamat: string }): Promise<ApiResponse<any>> {
     return this.request('/user/alamat', {
       method: 'POST',
       body: JSON.stringify(payload),
     })
+  }
+
+  async getAddresses(): Promise<ApiResponse<any>> {
+    return this.request('/user/alamat')
+  }
+
+  async getAddressDetail(id: number | string): Promise<ApiResponse<any>> {
+    return this.request(`/user/alamat/${id}`)
+  }
+
+  async updateAddress(id: number | string, payload: { judul_alamat: string; nama_penerima: string; no_telp: string; detail_alamat: string }): Promise<ApiResponse<any>> {
+    return this.request(`/user/alamat/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async deleteAddress(id: number | string): Promise<ApiResponse<any>> {
+    return this.request(`/user/alamat/${id}`, { method: 'DELETE' })
   }
 
   // Transaction (protected)

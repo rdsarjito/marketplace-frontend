@@ -5,16 +5,16 @@
       <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <div class="aspect-square bg-gray-100 rounded-xl overflow-hidden">
-            <img :src="activeImage || fallbackImage" alt="Product" class="w-full h-full object-cover" />
+            <img :src="activeImageDisplay" alt="Product" class="w-full h-full object-cover" />
           </div>
           <div class="mt-3 grid grid-cols-5 gap-2">
             <button
               v-for="photo in product.photos_product || []"
               :key="photo.id"
               class="aspect-square rounded-lg overflow-hidden border border-gray-200 hover:border-primary-500"
-              @click="activeImage = photo.url"
+              @click="activeImage = resolveAssetUrl(photo.url)"
             >
-              <img :src="photo.url" class="w-full h-full object-cover" />
+              <img :src="resolveAssetUrl(photo.url)" class="w-full h-full object-cover" />
             </button>
           </div>
         </div>
@@ -39,12 +39,14 @@ import { useRoute } from 'vue-router'
 import { apiService } from '@/services/api'
 import type { ProductItem } from '@/types/product'
 import { useCartStore } from '@/store/cart'
+import { resolveAssetUrl } from '@/services/api'
 
 const route = useRoute()
 const product = ref<ProductItem | null>(null)
 const activeImage = ref('')
 
 const fallbackImage = 'https://via.placeholder.com/800x800?text=No+Image'
+const activeImageDisplay = computed(() => activeImage.value || (product.value?.photos_product?.[0]?.url ? resolveAssetUrl(product.value.photos_product[0].url) : fallbackImage))
 
 const formattedPrice = computed(() => {
   if (!product.value) return ''
@@ -62,7 +64,7 @@ onMounted(async () => {
   const id = route.params.id as string
   const res = await apiService.getProductDetail(id)
   product.value = res.data as any
-  activeImage.value = product.value?.photos_product?.[0]?.url || ''
+  activeImage.value = product.value?.photos_product?.[0]?.url ? resolveAssetUrl(product.value.photos_product[0].url) : ''
 })
 
 const cart = useCartStore()
