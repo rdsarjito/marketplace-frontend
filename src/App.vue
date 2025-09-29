@@ -44,13 +44,34 @@
             <span v-if="msgCount>0" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] px-1 py-0.5 rounded-full">{{ msgCount }}</span>
           </button>
 
-          <!-- Cart -->
-          <RouterLink to="/cart" class="relative inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-50">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-700">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h13.5m-10.5-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-            </svg>
-            <span v-if="count>0" class="absolute -top-1 -right-1 bg-[#03AC0E] text-white text-[10px] px-1 py-0.5 rounded-full">{{ count }}</span>
-          </RouterLink>
+          <!-- Cart dropdown (desktop hover, mobile click) -->
+          <div class="relative" ref="cartRef" @mouseenter="onCartEnter" @mouseleave="onCartLeave">
+            <button @click.stop="onCartClick" class="relative inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-50">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-700">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h13.5m-10.5-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+              </svg>
+              <span v-if="count>0" class="absolute -top-1 -right-1 bg-[#03AC0E] text-white text-[10px] px-1 py-0.5 rounded-full">{{ count }}</span>
+            </button>
+            <div v-show="openCart" class="absolute right-0 z-40 mt-2 w-80 bg-white border rounded-lg shadow-md p-3 transition ease-in-out duration-200" :class="openCart ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'">
+              <div class="flex items-center justify-between mb-2">
+                <div class="font-semibold text-gray-900">Keranjang ({{ count }})</div>
+                <RouterLink to="/cart" class="text-[#03AC0E] text-sm">Lihat</RouterLink>
+              </div>
+              <div v-if="count === 0" class="py-6 text-center text-sm text-gray-600">Keranjang masih kosong</div>
+              <div v-else class="divide-y">
+                <div v-for="it in items" :key="it.id" class="py-2 flex items-center">
+                  <div class="w-12 h-12 rounded bg-gray-100 overflow-hidden mr-3 flex-shrink-0">
+                    <img v-if="it.image" :src="resolveAssetUrl(it.image)" class="w-full h-full object-cover" />
+                    <div v-else class="w-full h-full"></div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm text-gray-900 line-clamp-2">{{ it.nama }}</div>
+                  </div>
+                  <div class="ml-3 text-sm font-semibold text-gray-900 whitespace-nowrap">{{ it.qty }} × {{ formatIDR(it.harga) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- Dropdown Toko -->
           <div class="relative" ref="shopRef" @mouseenter="onShopEnter" @mouseleave="onShopLeave">
@@ -82,11 +103,11 @@ import { useCartStore } from '@/store/cart'
 import Toast from '@/components/Toast.vue'
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { apiService } from '@/services/api'
+import { apiService, resolveAssetUrl } from '@/services/api'
 import { useAuthStore } from '@/store/auth'
 
 const cart = useCartStore()
-const { count } = storeToRefs(cart)
+const { count, items } = storeToRefs(cart)
 
 const router = useRouter()
 const route = useRoute()
@@ -99,6 +120,7 @@ const selectedCategoryId = ref<number | null>(route.query.category_id ? Number(r
 const openCat = ref(false)
 const openShop = ref(false)
 const openProfile = ref(false)
+const openCart = ref(false)
 const notifCount = ref(2)
 const msgCount = ref(1)
 const categories = ref<{ id: number, name: string }[]>([])
@@ -178,6 +200,27 @@ const onProfileLeave = () => {
   }
 }
 const onProfileClick = () => { if (isMobile.value) toggleProfile() }
+
+// Cart hover/click behavior
+let cartHideTimer: number | null = null
+const cartRef = ref<HTMLElement | null>(null)
+const onCartEnter = () => {
+  if (cartHideTimer) { clearTimeout(cartHideTimer); cartHideTimer = null }
+  if (!isMobile.value) openCart.value = true
+}
+const onCartLeave = () => {
+  if (!isMobile.value) cartHideTimer = window.setTimeout(() => { openCart.value = false }, 150)
+}
+const onCartClick = () => {
+  if (isMobile.value) {
+    // On mobile, go straight to cart if already open once, else open dropdown
+    if (openCart.value) {
+      router.push('/cart')
+    } else {
+      openCart.value = true
+    }
+  }
+}
 const alertInfo = (msg: string) => { console.log(msg) }
 const submitSearch = () => {
   router.push({ path: '/products', query: { q: q.value || undefined, category_id: selectedCategoryId.value || undefined } })
@@ -205,4 +248,7 @@ const onDocClick = (e: MouseEvent) => {
 }
 onMounted(() => document.addEventListener('click', onDocClick))
 onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
+
+// Utils
+const formatIDR = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 </script>

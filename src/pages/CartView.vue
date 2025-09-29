@@ -7,7 +7,7 @@
         <div v-else class="space-y-4">
           <div v-for="it in items" :key="it.id" class="flex items-center gap-3 border-b border-gray-100 pb-4">
             <div class="w-20 h-20 bg-gray-100 rounded overflow-hidden">
-              <img v-if="it.image" :src="it.image" class="w-full h-full object-cover" />
+              <img v-if="it.image" :src="resolveAssetUrl(it.image)" class="w-full h-full object-cover" />
             </div>
             <div class="flex-1">
               <div class="text-gray-900 font-medium">{{ it.nama }}</div>
@@ -40,6 +40,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '@/store/cart'
+import { resolveAssetUrl } from '@/services/api'
 
 const cart = useCartStore()
 const { items, subtotal } = storeToRefs(cart)
