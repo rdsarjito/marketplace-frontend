@@ -1,21 +1,21 @@
 <template>
   <div>
-    <header class="bg-white border-b border-gray-200">
+    <header v-if="showHeader" class="bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4">
         <!-- Kiri: Logo -->
-        <RouterLink to="/products" class="text-[#03AC0E] font-semibold text-lg">Evermos</RouterLink>
+        <RouterLink to="/dashboard" class="text-[#03AC0E] font-semibold text-lg">Evermos</RouterLink>
 
         <!-- Tengah: Kategori + Search -->
         <div class="flex-1 flex items-center gap-2">
-          <div class="relative" ref="catRef">
-            <button @click.stop="toggleCat" class="h-10 px-3 rounded-lg border text-sm flex items-center gap-2 hover:border-[#03AC0E]">
+          <div class="relative" ref="catRef" @mouseenter="onCatEnter" @mouseleave="onCatLeave">
+            <button @click.stop="onCatClick" class="h-10 px-3 rounded-lg border text-sm flex items-center gap-2 hover:border-[#03AC0E]">
               <span class="w-1.5 h-1.5 rounded-full bg-[#03AC0E]"></span>
               Kategori
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                 <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
               </svg>
             </button>
-            <div v-if="openCat" class="absolute z-40 mt-2 w-56 bg-white border rounded-lg shadow p-2">
+            <div v-show="openCat" class="absolute z-40 mt-2 w-56 bg-white border rounded-lg shadow p-2 transition ease-in-out duration-200" :class="openCat ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'">
               <div v-if="catLoading" class="text-sm text-gray-500 px-2 py-1">Sedang memuat…</div>
               <div v-else class="max-h-64 overflow-y-auto">
                 <button v-for="c in categories" :key="c.id" @click="selectCategory(c)" class="w-full text-left px-2 py-1 rounded hover:bg-gray-50 text-sm">{{ c.name }}</button>
@@ -53,17 +53,17 @@
           </RouterLink>
 
           <!-- Dropdown Toko -->
-          <div class="relative" ref="shopRef">
-            <button @click.stop="toggleShop" class="h-10 px-3 rounded-lg border text-sm hover:border-[#03AC0E]">Toko</button>
-            <div v-if="openShop" class="absolute right-0 z-40 mt-2 w-44 bg-white border rounded-lg shadow p-2">
+          <div class="relative" ref="shopRef" @mouseenter="onShopEnter" @mouseleave="onShopLeave">
+            <button @click.stop="onShopClick" class="h-10 px-3 rounded-lg border text-sm hover:border-[#03AC0E]">Toko</button>
+            <div v-show="openShop" class="absolute right-0 z-40 mt-2 w-44 bg-white border rounded-lg shadow p-2 transition ease-in-out duration-200" :class="openShop ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'">
               <RouterLink to="/my-products" class="block px-2 py-1 text-sm rounded hover:bg-gray-50">Produk Saya</RouterLink>
             </div>
           </div>
 
           <!-- Dropdown Profile -->
-          <div class="relative" ref="profileRef">
-            <button @click.stop="toggleProfile" class="h-10 px-3 rounded-lg border text-sm hover:border-[#03AC0E]">Profile</button>
-            <div v-if="openProfile" class="absolute right-0 z-40 mt-2 w-44 bg-white border rounded-lg shadow p-2">
+          <div class="relative" ref="profileRef" @mouseenter="onProfileEnter" @mouseleave="onProfileLeave">
+            <button @click.stop="onProfileClick" class="h-10 px-3 rounded-lg border text-sm hover:border-[#03AC0E]">Profile</button>
+            <div v-show="openProfile" class="absolute right-0 z-40 mt-2 w-44 bg-white border rounded-lg shadow p-2 transition ease-in-out duration-200" :class="openProfile ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'">
               <RouterLink to="/profile" class="block px-2 py-1 text-sm rounded hover:bg-gray-50">Lihat Profil</RouterLink>
               <button class="block w-full text-left px-2 py-1 text-sm rounded hover:bg-gray-50 text-red-600" @click="logout">Logout</button>
             </div>
@@ -80,15 +80,20 @@
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '@/store/cart'
 import Toast from '@/components/Toast.vue'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { apiService } from '@/services/api'
+import { useAuthStore } from '@/store/auth'
 
 const cart = useCartStore()
 const { count } = storeToRefs(cart)
 
 const router = useRouter()
 const route = useRoute()
+const showHeader = computed(() => {
+  const p = route.path
+  return !(p.startsWith('/login') || p.startsWith('/register'))
+})
 const q = ref<string>((route.query.q as string) || '')
 const selectedCategoryId = ref<number | null>(route.query.category_id ? Number(route.query.category_id) : null)
 const openCat = ref(false)
@@ -135,12 +140,52 @@ const toggleProfile = () => {
   openProfile.value = next
   if (next) { openCat.value = false; openShop.value = false }
 }
+
+// Hover handlers (desktop) + click handlers for mobile fallback
+const isMobile = computed(() => window.matchMedia('(max-width: 640px)').matches)
+let catHideTimer: number | null = null
+const onCatEnter = () => {
+  if (catHideTimer) { clearTimeout(catHideTimer); catHideTimer = null }
+  if (!isMobile.value) { openCat.value = true; openShop.value = false; openProfile.value = false }
+}
+const onCatLeave = () => {
+  if (!isMobile.value) {
+    catHideTimer = window.setTimeout(() => { openCat.value = false }, 150)
+  }
+}
+const onCatClick = () => { if (isMobile.value) toggleCat() }
+
+let shopHideTimer: number | null = null
+const onShopEnter = () => {
+  if (shopHideTimer) { clearTimeout(shopHideTimer); shopHideTimer = null }
+  if (!isMobile.value) { openShop.value = true; openCat.value = false; openProfile.value = false }
+}
+const onShopLeave = () => {
+  if (!isMobile.value) {
+    shopHideTimer = window.setTimeout(() => { openShop.value = false }, 150)
+  }
+}
+const onShopClick = () => { if (isMobile.value) toggleShop() }
+
+let profileHideTimer: number | null = null
+const onProfileEnter = () => {
+  if (profileHideTimer) { clearTimeout(profileHideTimer); profileHideTimer = null }
+  if (!isMobile.value) { openProfile.value = true; openCat.value = false; openShop.value = false }
+}
+const onProfileLeave = () => {
+  if (!isMobile.value) {
+    profileHideTimer = window.setTimeout(() => { openProfile.value = false }, 150)
+  }
+}
+const onProfileClick = () => { if (isMobile.value) toggleProfile() }
 const alertInfo = (msg: string) => { console.log(msg) }
 const submitSearch = () => {
   router.push({ path: '/products', query: { q: q.value || undefined, category_id: selectedCategoryId.value || undefined } })
 }
+const auth = useAuthStore()
 const logout = () => {
-  localStorage.removeItem('token')
+  auth.logout()
+  openProfile.value = false
   router.push('/login')
 }
 

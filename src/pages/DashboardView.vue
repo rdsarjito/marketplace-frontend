@@ -1,25 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <div class="flex items-center">
-            <h1 class="text-2xl font-bold text-primary-600">Marketplace</h1>
-          </div>
-          <div class="flex items-center space-x-4">
-            <span class="text-gray-700">Welcome, {{ user?.nama }}</span>
-            <button
-              @click="handleLogout"
-              class="btn-secondary"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div class="px-4 py-6 sm:px-0">
