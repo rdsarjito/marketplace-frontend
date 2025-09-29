@@ -19,18 +19,36 @@
 
           <!-- Form alamat baru -->
           <div v-if="showNewAddress || !addresses.length" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input v-model="form.nama_penerima" type="text" class="input-field" placeholder="Nama penerima" />
-            <input v-model="form.no_telp" type="tel" class="input-field" placeholder="No. Telepon" />
-            <select v-model="form.id_provinsi" class="input-field" @change="loadCities">
+            <div>
+              <input v-model="form.nama_penerima" type="text" :class="['input-field', validationErrors.nama_penerima ? 'border-red-500 focus:ring-red-500' : '']" placeholder="Nama penerima" />
+              <p v-if="validationErrors.nama_penerima" class="text-xs text-red-600 mt-1">Nama penerima wajib diisi</p>
+            </div>
+            <div>
+              <input v-model="form.no_telp" type="tel" :class="['input-field', validationErrors.no_telp ? 'border-red-500 focus:ring-red-500' : '']" placeholder="No. Telepon" />
+              <p v-if="validationErrors.no_telp" class="text-xs text-red-600 mt-1">No. telepon wajib diisi</p>
+            </div>
+            <div>
+              <select v-model="form.id_provinsi" :class="['input-field', validationErrors.id_provinsi ? 'border-red-500 focus:ring-red-500' : '']" @change="loadCities">
               <option value="">Pilih Provinsi</option>
               <option v-for="p in provinces" :key="p.id" :value="p.id">{{ p.name }}</option>
-            </select>
-            <select v-model="form.id_kota" class="input-field" :disabled="!form.id_provinsi">
+              </select>
+              <p v-if="validationErrors.id_provinsi" class="text-xs text-red-600 mt-1">Provinsi wajib dipilih</p>
+            </div>
+            <div>
+              <select v-model="form.id_kota" :class="['input-field', validationErrors.id_kota ? 'border-red-500 focus:ring-red-500' : '']" :disabled="!form.id_provinsi">
               <option value="">Pilih Kota</option>
               <option v-for="c in cities" :key="c.id" :value="c.id">{{ c.name }}</option>
-            </select>
-            <input v-model="form.alamat" type="text" class="input-field sm:col-span-2" placeholder="Alamat lengkap" />
-            <input v-model="form.kode_pos" type="text" class="input-field" placeholder="Kode pos" />
+              </select>
+              <p v-if="validationErrors.id_kota" class="text-xs text-red-600 mt-1">Kota wajib dipilih</p>
+            </div>
+            <div class="sm:col-span-2">
+              <input v-model="form.alamat" type="text" :class="['input-field', validationErrors.alamat ? 'border-red-500 focus:ring-red-500' : '']" placeholder="Alamat lengkap" />
+              <p v-if="validationErrors.alamat" class="text-xs text-red-600 mt-1">Alamat lengkap wajib diisi</p>
+            </div>
+            <div>
+              <input v-model="form.kode_pos" type="text" :class="['input-field', validationErrors.kode_pos ? 'border-red-500 focus:ring-red-500' : '']" placeholder="Kode pos" />
+              <p v-if="validationErrors.kode_pos" class="text-xs text-red-600 mt-1">Kode pos wajib diisi</p>
+            </div>
           </div>
         </div>
 
@@ -51,6 +69,12 @@
 
       <div class="bg-white rounded-xl shadow p-4 h-fit">
         <h2 class="text-lg font-semibold mb-3">Ringkasan Pesanan</h2>
+        <div class="mb-3 p-3 rounded border bg-gray-50" v-if="addressSummary.detail">
+          <div class="text-sm text-gray-600 mb-1">Dikirim ke</div>
+          <div class="text-sm text-gray-900 font-medium">{{ addressSummary.name }}</div>
+          <div class="text-sm text-gray-700">{{ addressSummary.detail }}</div>
+          <div class="text-xs text-gray-500">{{ addressSummary.phone }}</div>
+        </div>
         <div class="space-y-2 mb-3">
           <div v-for="it in items" :key="it.id" class="flex justify-between text-sm text-gray-700">
             <span>{{ it.nama }} × {{ it.qty }}</span>
@@ -76,9 +100,11 @@ import { computed, onMounted, ref } from 'vue'
 import { apiService } from '@/services/api'
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '@/store/cart'
+import { useRouter } from 'vue-router'
 
 const cart = useCartStore()
 const { items, subtotal } = storeToRefs(cart)
+const router = useRouter()
 
 const provinces = ref<any[]>([])
 const cities = ref<any[]>([])
@@ -108,6 +134,20 @@ const canPlaceOrder = computed(() => {
 const successMsg = ref('')
 const errorMsg = ref('')
 const placing = ref(false)
+const validationErrors = ref<{ [k: string]: boolean }>({})
+const addressSummary = computed(() => {
+  if (selectedAddressId.value && addresses.value.length) {
+    const found = addresses.value.find((a: any) => a.id === selectedAddressId.value)
+    if (found) return { name: found.nama_penerima, phone: found.no_telp || '', detail: found.detail_alamat }
+  }
+  if (!selectedAddressId.value) {
+    const name = form.value.nama_penerima
+    const phone = form.value.no_telp
+    const detail = [form.value.alamat, form.value.id_kota, form.value.id_provinsi, form.value.kode_pos].filter(Boolean).join(', ')
+    return { name, phone, detail }
+  }
+  return { name: '', phone: '', detail: '' }
+})
 
 const formatIDR = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 
@@ -149,6 +189,17 @@ const ensureAddressAndPlaceOrder = async () => {
   // Use selected saved address or create a new one
   let idAlamat = selectedAddressId.value || 0
   if (!idAlamat) {
+    // simple validation for new address
+    validationErrors.value = {
+      nama_penerima: !form.value.nama_penerima,
+      no_telp: !form.value.no_telp,
+      id_provinsi: !form.value.id_provinsi,
+      id_kota: !form.value.id_kota,
+      alamat: !form.value.alamat,
+      kode_pos: !form.value.kode_pos,
+    }
+    const hasError = Object.values(validationErrors.value).some(Boolean)
+    if (hasError) { placing.value = false; return }
     const addressRes = await fetch('http://127.0.0.1:8080/api/v1/user/alamat', {
     method: 'POST',
     headers: {
@@ -195,6 +246,8 @@ const ensureAddressAndPlaceOrder = async () => {
     await apiService.createTransaction(trxPayload)
     cart.clear()
     successMsg.value = 'Pesanan berhasil dibuat.'
+    // Redirect to orders after a short delay for UX
+    setTimeout(() => router.push('/orders'), 300)
   } catch (e: any) {
     errorMsg.value = e?.message || 'Gagal membuat pesanan'
   } finally {
