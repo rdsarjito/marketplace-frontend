@@ -1,25 +1,19 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
-      <h1 class="text-2xl font-bold text-gray-900 mb-4">Produk</h1>
-
-      <div class="bg-white rounded-xl shadow p-4 mb-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <input v-model="q" type="text" class="input-field" placeholder="Cari produk..." @keyup.enter="fetchProducts" />
-        <select v-model="categoryId" class="input-field">
-          <option value="">Semua Kategori</option>
-          <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.nama_kategori || cat.name }}</option>
-        </select>
-        <button class="btn-primary" @click="fetchProducts">Cari</button>
+      <div v-if="activeCategoryLabel" class="mb-3 text-sm text-gray-700">
+        <span class="text-gray-500">Kategori:</span>
+        <span class="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200">
+          {{ activeCategoryLabel }}
+        </span>
       </div>
+
+      
 
       <div v-if="loading">
         <SkeletonList :columns="'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4'" :count="10" />
       </div>
-      <EmptyState v-else-if="filteredProducts.length === 0" title="Produk tidak ditemukan" description="Coba ubah kata kunci atau filter kategori.">
-        <template #action>
-          <button class="btn-secondary" @click="resetFilters">Reset filter</button>
-        </template>
-      </EmptyState>
+      <EmptyState v-else-if="filteredProducts.length === 0" title="Produk tidak ditemukan" description="Produk tidak tersedia untuk kriteria saat ini." />
       <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <ProductCard v-for="p in filteredProducts" :key="p.id" :product="p" @view="goDetail" />
       </div>
@@ -34,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { apiService } from '@/services/api'
 import ProductCard from '@/components/ProductCard.vue'
 import SkeletonList from '@/components/SkeletonList.vue'
@@ -46,8 +40,10 @@ const loading = ref(false)
 const categories = ref<any[]>([])
 const page = ref(1)
 const pageSize = ref(20)
-const q = ref('')
-const categoryId = ref('')
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const q = ref<string>((route.query.q as string) || '')
+const categoryId = ref<string>((route.query.category_id as string) || '')
 const hasMore = ref(false)
 
 const fetchCategories = async () => {
@@ -82,6 +78,13 @@ const filteredProducts = computed(() => {
   )
 })
 
+const activeCategoryLabel = computed(() => {
+  const id = Number(categoryId.value || 0)
+  if (!id) return ''
+  const c = categories.value.find((x: any) => Number(x.id) === id)
+  return c ? (c.nama_kategori || c.name) : ''
+})
+
 const prevPage = async () => {
   if (page.value > 1) {
     page.value -= 1
@@ -112,6 +115,19 @@ const resetFilters = async () => {
   page.value = 1
   await fetchProducts()
 }
+
+// React to route query changes (from header search/category)
+watch(() => route.query.q, async (newQ) => {
+  q.value = (newQ as string) || ''
+  page.value = 1
+  await fetchProducts()
+})
+
+watch(() => route.query.category_id, async (newCat) => {
+  categoryId.value = (newCat as string) || ''
+  page.value = 1
+  await fetchProducts()
+})
 </script>
 
 
