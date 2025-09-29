@@ -11,13 +11,19 @@
           <option value="SELESAI">Selesai</option>
         </select>
       </div>
-      <div v-if="loading" class="text-gray-600">Memuat...</div>
-      <div v-else-if="filteredOrders.length===0" class="text-gray-600">
-        <div class="p-6 text-center">
-          <div class="text-lg font-medium text-gray-900 mb-1">Belum ada pesanan yang cocok</div>
-          <div class="text-sm">Coba ubah kata kunci atau filter status.</div>
-        </div>
+      <div v-if="loading" class="text-gray-600">
+        <SkeletonList :columns="'grid-cols-1'" :count="4" />
       </div>
+      <EmptyState v-else-if="filteredOrders.length===0" title="Belum ada pesanan yang cocok" description="Coba ubah kata kunci atau filter status.">
+        <template #icon>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-gray-500">
+            <path fill-rule="evenodd" d="M2.25 13.5a8.25 8.25 0 1115.534 3.977l2.369 2.37a.75.75 0 11-1.06 1.06l-2.37-2.369A8.25 8.25 0 012.25 13.5zm8.25-6a.75.75 0 01.75.75v3.75H15a.75.75 0 010 1.5h-3.75V18a.75.75 0 01-1.5 0v-4.5H6a.75.75 0 010-1.5h3.75V8.25a.75.75 0 01.75-.75z" clip-rule="evenodd" />
+          </svg>
+        </template>
+        <template #action>
+          <RouterLink class="btn-primary" to="/products">Belanja sekarang</RouterLink>
+        </template>
+      </EmptyState>
       <div v-else class="divide-y">
         <div v-for="o in filteredOrders" :key="o.id" class="py-3 flex items-center justify-between">
           <div>
@@ -38,6 +44,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { apiService } from '@/services/api'
+import SkeletonList from '@/components/SkeletonList.vue'
+import EmptyState from '@/components/EmptyState.vue'
 
 const orders = ref<any[]>([])
 const loading = ref(false)

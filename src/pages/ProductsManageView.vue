@@ -11,7 +11,14 @@
             <option :value="24">24 / halaman</option>
           </select>
         </div>
-        <div v-if="paginatedProducts.length === 0" class="text-gray-600 p-6 text-center">Tidak ada produk yang cocok.</div>
+        <div v-if="loading">
+          <SkeletonList :columns="'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3'" :count="8" />
+        </div>
+        <EmptyState v-else-if="paginatedProducts.length === 0" title="Tidak ada produk" description="Coba ubah kata kunci pencarian.">
+          <template #action>
+            <button class="btn-secondary" @click="query=''; page=1">Reset</button>
+          </template>
+        </EmptyState>
         <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           <div v-for="p in paginatedProducts" :key="p.id" class="border rounded p-3">
             <div class="aspect-square bg-gray-100 rounded mb-2 overflow-hidden">
@@ -76,9 +83,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { apiService, resolveAssetUrl } from '@/services/api'
+import { useToastStore } from '@/store/toast'
 import type { ProductItem } from '@/types/product'
+import SkeletonList from '@/components/SkeletonList.vue'
+import EmptyState from '@/components/EmptyState.vue'
 
 const products = ref<ProductItem[]>([])
+const loading = ref(false)
 const query = ref('')
 const page = ref(1)
 const perPage = ref(8)
@@ -91,6 +102,7 @@ const photoInput = ref<HTMLInputElement | null>(null)
 const formatIDR = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 
 const load = async () => {
+  loading.value = true
   const res = await apiService.getProducts()
   const cats = await apiService.getCategories()
   categories.value = Array.isArray(cats.data) ? cats.data : []
@@ -104,6 +116,7 @@ const load = async () => {
     products.value = Array.isArray(res.data) ? res.data : []
   }
   page.value = 1
+  loading.value = false
 }
 
 const edit = (p: ProductItem) => {
@@ -134,6 +147,7 @@ const submit = async () => {
     if (photoFile.value && newId) {
       await apiService.uploadProductPhoto(newId, photoFile.value)
     }
+    useToastStore().success('Produk berhasil dibuat')
   } else {
     await apiService.updateProduct(form.value.id, {
       nama_produk: form.value.nama_produk,
@@ -146,6 +160,7 @@ const submit = async () => {
     if (photoFile.value) {
       await apiService.uploadProductPhoto(form.value.id, photoFile.value)
     }
+    useToastStore().success('Produk berhasil diperbarui')
   }
   reset()
   await load()
@@ -154,6 +169,7 @@ const submit = async () => {
 const del = async (id: number) => {
   if (!confirm('Hapus produk ini? Tindakan tidak dapat dibatalkan.')) return
   await apiService.deleteProduct(id)
+  useToastStore().success('Produk dihapus')
   await load()
 }
 
@@ -181,6 +197,7 @@ const paginatedProducts = computed(() => {
 const updateStock = async (p: any) => {
   if (!p || !p.id) return
   await apiService.updateProduct(p.id, { stok: Number(p.stok) })
+  useToastStore().success('Stok diperbarui')
 }
 
 const toggleActive = async (p: any) => {
@@ -190,6 +207,7 @@ const toggleActive = async (p: any) => {
   await apiService.updateProduct(p.id, { is_active: nextActive, status: nextActive ? 'ACTIVE' : 'INACTIVE' })
   p.is_active = nextActive
   p.status = nextActive ? 'ACTIVE' : 'INACTIVE'
+  useToastStore().success(nextActive ? 'Produk diaktifkan' : 'Produk dinonaktifkan')
 }
 </script>
 

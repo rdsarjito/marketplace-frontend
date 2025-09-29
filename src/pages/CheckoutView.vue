@@ -75,7 +75,10 @@
           <div class="text-sm text-gray-700">{{ addressSummary.detail }}</div>
           <div class="text-xs text-gray-500">{{ addressSummary.phone }}</div>
         </div>
-        <div class="space-y-2 mb-3">
+        <div v-if="placing" class="mb-3">
+          <SkeletonList :columns="'grid-cols-1'" :count="3" />
+        </div>
+        <div v-else class="space-y-2 mb-3">
           <div v-for="it in items" :key="it.id" class="flex justify-between text-sm text-gray-700">
             <span>{{ it.nama }} × {{ it.qty }}</span>
             <span>{{ formatIDR(it.harga * it.qty) }}</span>
@@ -100,7 +103,9 @@ import { computed, onMounted, ref } from 'vue'
 import { apiService } from '@/services/api'
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '@/store/cart'
+import SkeletonList from '@/components/SkeletonList.vue'
 import { useRouter } from 'vue-router'
+import { useToastStore } from '@/store/toast'
 
 const cart = useCartStore()
 const { items, subtotal } = storeToRefs(cart)
@@ -246,10 +251,12 @@ const ensureAddressAndPlaceOrder = async () => {
     await apiService.createTransaction(trxPayload)
     cart.clear()
     successMsg.value = 'Pesanan berhasil dibuat.'
+    useToastStore().success('Pesanan berhasil dibuat')
     // Redirect to orders after a short delay for UX
     setTimeout(() => router.push('/orders'), 300)
   } catch (e: any) {
     errorMsg.value = e?.message || 'Gagal membuat pesanan'
+    useToastStore().error(errorMsg.value)
   } finally {
     placing.value = false
   }

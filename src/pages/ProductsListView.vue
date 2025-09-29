@@ -12,9 +12,14 @@
         <button class="btn-primary" @click="fetchProducts">Cari</button>
       </div>
 
-      <div v-if="filteredProducts.length === 0" class="text-gray-600 text-center py-10">
-        Tidak ada produk.
+      <div v-if="loading">
+        <SkeletonList :columns="'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4'" :count="10" />
       </div>
+      <EmptyState v-else-if="filteredProducts.length === 0" title="Produk tidak ditemukan" description="Coba ubah kata kunci atau filter kategori.">
+        <template #action>
+          <button class="btn-secondary" @click="resetFilters">Reset filter</button>
+        </template>
+      </EmptyState>
       <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <ProductCard v-for="p in filteredProducts" :key="p.id" :product="p" @view="goDetail" />
       </div>
@@ -32,9 +37,12 @@
 import { ref, onMounted, computed } from 'vue'
 import { apiService } from '@/services/api'
 import ProductCard from '@/components/ProductCard.vue'
+import SkeletonList from '@/components/SkeletonList.vue'
+import EmptyState from '@/components/EmptyState.vue'
 import type { ProductItem } from '@/types/product'
 
 const products = ref<ProductItem[]>([])
+const loading = ref(false)
 const categories = ref<any[]>([])
 const page = ref(1)
 const pageSize = ref(20)
@@ -52,9 +60,14 @@ const fetchCategories = async () => {
 }
 
 const fetchProducts = async () => {
-  const res = await apiService.getProducts({ page: page.value, page_size: pageSize.value, q: q.value || undefined, category_id: categoryId.value || undefined })
-  products.value = Array.isArray(res.data) ? res.data : []
-  hasMore.value = products.value.length === pageSize.value
+  loading.value = true
+  try {
+    const res = await apiService.getProducts({ page: page.value, page_size: pageSize.value, q: q.value || undefined, category_id: categoryId.value || undefined })
+    products.value = Array.isArray(res.data) ? res.data : []
+    hasMore.value = products.value.length === pageSize.value
+  } finally {
+    loading.value = false
+  }
 }
 
 const filteredProducts = computed(() => {
@@ -92,6 +105,13 @@ onMounted(async () => {
   await fetchCategories()
   await fetchProducts()
 })
+
+const resetFilters = async () => {
+  q.value = ''
+  categoryId.value = ''
+  page.value = 1
+  await fetchProducts()
+}
 </script>
 
 

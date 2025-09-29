@@ -17,12 +17,14 @@
       </div>
     </header>
     <router-view />
+    <Toast />
   </div>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '@/store/cart'
+import Toast from '@/components/Toast.vue'
 const cart = useCartStore()
 const { count } = storeToRefs(cart)
 </script>
