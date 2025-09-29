@@ -24,7 +24,7 @@
           <div class="mt-1 text-sm text-gray-500">Stok: {{ product.stok }}</div>
           <div class="mt-4 prose max-w-none" v-html="formattedDescription"></div>
           <div class="mt-6 flex space-x-3">
-            <button class="btn-primary">Tambah ke Keranjang</button>
+            <button class="btn-primary" @click="addToCart">Tambah ke Keranjang</button>
             <button class="btn-secondary">Beli Sekarang</button>
           </div>
         </div>
@@ -38,6 +38,7 @@ import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { apiService } from '@/services/api'
 import type { ProductItem } from '@/types/product'
+import { useCartStore } from '@/store/cart'
 
 const route = useRoute()
 const product = ref<ProductItem | null>(null)
@@ -63,6 +64,13 @@ onMounted(async () => {
   product.value = res.data as any
   activeImage.value = product.value?.photos_product?.[0]?.url || ''
 })
+
+const cart = useCartStore()
+const addToCart = () => {
+  if (product.value) {
+    cart.addProduct(product.value, 1)
+  }
+}
 </script>
 
 

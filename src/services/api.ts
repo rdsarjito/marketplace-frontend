@@ -87,6 +87,35 @@ class ApiService {
   async getProductDetail(idOrSlug: string | number): Promise<ApiResponse<ProductItem>> {
     return this.request<ProductItem>(`/product/${idOrSlug}`)
   }
+
+  // Address (protected)
+  async createAddress(payload: { judul_alamat: string; nama_penerima: string; no_telp: string; detail_alamat: string }): Promise<ApiResponse<any>> {
+    return this.request('/user/alamat', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  // Transaction (protected)
+  async createTransaction(payload: {
+    harga_total: number
+    method_bayar: string
+    id_alamat: number
+    detail_trx: Array<{ id_produk: number; id_toko: number; kuantitas: number; harga_total: number }>
+  }): Promise<ApiResponse<any>> {
+    return this.request('/trx', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async getOrders(): Promise<ApiResponse<any>> {
+    return this.request('/trx')
+  }
+
+  async getOrderDetail(id: number | string): Promise<ApiResponse<any>> {
+    return this.request(`/trx/${id}`)
+  }
 }
 
 export const apiService = new ApiService(API_BASE_URL)

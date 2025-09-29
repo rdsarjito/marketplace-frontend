@@ -9,7 +9,10 @@
       <div class="text-primary-600 font-semibold">{{ formattedPrice }}</div>
       <div class="text-xs text-gray-500">Stok: {{ product.stok }}</div>
     </div>
-    <RouterLink class="mt-3 btn-primary py-2 text-sm text-center" :to="`/products/${product.id}`">Lihat Detail</RouterLink>
+    <div class="mt-3 grid grid-cols-2 gap-2">
+      <RouterLink class="btn-secondary py-2 text-sm text-center" :to="`/products/${product.id}`">Detail</RouterLink>
+      <button class="btn-primary py-2 text-sm" @click="onAddToCart">+ Keranjang</button>
+    </div>
   </div>
 
   
@@ -18,6 +21,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { ProductItem } from '@/types/product'
+import { useCartStore } from '@/store/cart'
 
 const props = defineProps<{ product: ProductItem }>()
 
@@ -29,6 +33,11 @@ const formattedPrice = computed(() => {
   if (Number.isNaN(num)) return raw
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num)
 })
+
+const cart = useCartStore()
+const onAddToCart = () => {
+  cart.addProduct(props.product, 1)
+}
 </script>
 
 <style scoped>

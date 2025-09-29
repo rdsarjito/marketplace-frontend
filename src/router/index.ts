@@ -5,6 +5,10 @@ import RegisterView from '@/pages/RegisterView.vue'
 import DashboardView from '@/pages/DashboardView.vue'
 import ProductsListView from '@/pages/ProductsListView.vue'
 import ProductDetailView from '@/pages/ProductDetailView.vue'
+import CartView from '@/pages/CartView.vue'
+import CheckoutView from '@/pages/CheckoutView.vue'
+import OrdersView from '@/pages/OrdersView.vue'
+import OrderDetailView from '@/pages/OrderDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,6 +47,30 @@ const router = createRouter({
       name: 'product-detail',
       component: ProductDetailView,
       meta: { requiresAuth: false }
+    },
+    {
+      path: '/cart',
+      name: 'cart',
+      component: CartView,
+      meta: { requiresAuth: false }
+    },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: CheckoutView,
+      meta: { requiresAuth: false }
+    },
+    {
+      path: '/orders',
+      name: 'orders',
+      component: OrdersView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/orders/:id',
+      name: 'order-detail',
+      component: OrderDetailView,
+      meta: { requiresAuth: true }
     }
   ]
 })
