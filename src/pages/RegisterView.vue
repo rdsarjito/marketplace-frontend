@@ -254,9 +254,11 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import type { RegisterRequest } from '@/types/auth'
+import { useToastStore } from '@/store/toast'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toast = useToastStore()
 
 const form = reactive<RegisterRequest>({
   nama: '',
@@ -310,6 +312,7 @@ const handleRegister = async () => {
   
   try {
     await authStore.register(form)
+    toast.success('Akun berhasil dibuat. Silakan login.')
     router.push('/login')
   } catch (err: any) {
     error.value = err.message || 'Registration failed'

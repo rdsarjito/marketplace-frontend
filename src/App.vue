@@ -90,8 +90,8 @@
             </div>
           </div>
         </div>
-      </div>
-    </header>
+    </div>
+  </header>
     <router-view />
     <Toast />
   </div>
