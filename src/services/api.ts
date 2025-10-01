@@ -71,6 +71,24 @@ class ApiService {
     })
   }
 
+  async forgotPassword(email: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    })
+  }
+
+  async resetPassword(payload: {
+    token: string
+    kata_sandi: string
+    confirm_password: string
+  }): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+
   // User endpoints
   async getUserProfile(): Promise<ApiResponse<any>> {
     return this.request('/user')

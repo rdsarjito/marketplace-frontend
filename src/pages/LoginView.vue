@@ -82,9 +82,9 @@
 
           <!-- Forgot Password Link -->
           <div class="text-right">
-            <a href="#" class="text-sm text-primary-600 hover:text-primary-500">
-              Forgot Password?
-            </a>
+            <RouterLink to="/forgot-password" class="text-sm text-[#03AC0E] hover:text-[#028A0B]">
+              Lupa Password?
+            </RouterLink>
           </div>
 
           <!-- Error Message -->
