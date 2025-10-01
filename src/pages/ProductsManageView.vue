@@ -5,11 +5,6 @@
         <h1 class="text-xl font-semibold mb-4">Produk Saya</h1>
         <div class="flex flex-col sm:flex-row gap-3 mb-4">
           <input v-model="query" type="text" class="input-field sm:flex-1" placeholder="Cari nama produk..." />
-          <select v-model.number="perPage" class="input-field sm:w-48">
-            <option :value="8">8 / halaman</option>
-            <option :value="12">12 / halaman</option>
-            <option :value="24">24 / halaman</option>
-          </select>
         </div>
         <div v-if="loading">
           <SkeletonList :columns="'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3'" :count="8" />
