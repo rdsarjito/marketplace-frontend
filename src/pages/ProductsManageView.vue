@@ -32,7 +32,7 @@
                   {{ (p.is_active === false || p.status === 'INACTIVE') ? 'Nonaktif' : 'Aktif' }}
                 </button>
               </div>
-              <div class="flex gap-2 pt-1">
+              <div class="flex gap-2 pt-1 justify-end">
                 <button class="btn-secondary" @click="edit(p)">Edit</button>
                 <button class="text-red-600 hover:text-red-700 p-1" @click="del(p.id)" title="Hapus" aria-label="Hapus">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
