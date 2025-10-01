@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl shadow hover:shadow-md transition p-4 flex flex-col">
+  <div class="bg-white rounded-xl shadow hover:shadow-md transition p-4 flex flex-col cursor-pointer" @click="goDetail">
     <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3">
       <img v-if="imageUrl" :src="imageUrl" alt="Product image" class="w-full h-full object-cover" />
       <div v-else class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
@@ -11,7 +11,7 @@
     </div>
     <div class="mt-3 grid grid-cols-2 gap-2">
       <RouterLink class="btn-secondary py-2 text-sm text-center" :to="`/products/${product.id}`">Detail</RouterLink>
-      <button class="w-full h-10 bg-[#03AC0E] text-white font-semibold rounded-full shadow-sm hover:bg-[#029a0c] transition" @click="onAddToCart">+ Keranjang</button>
+      <button class="btn-primary py-2 text-sm" @click.stop="onAddToCart">+ Keranjang</button>
     </div>
   </div>
 
@@ -20,11 +20,13 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import type { ProductItem } from '@/types/product'
 import { useCartStore } from '@/store/cart'
 import { resolveAssetUrl } from '@/services/api'
 
 const props = defineProps<{ product: ProductItem }>()
+const router = useRouter()
 
 const fallback = ''
 const imageUrl = computed(() => {
@@ -42,6 +44,10 @@ const formattedPrice = computed(() => {
 const cart = useCartStore()
 const onAddToCart = () => {
   cart.addProduct(props.product, 1)
+}
+
+const goDetail = () => {
+  router.push(`/products/${props.product.id}`)
 }
 </script>
 

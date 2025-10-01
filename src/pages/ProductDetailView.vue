@@ -24,8 +24,8 @@
           <div class="mt-1 text-sm text-gray-500">Stok: {{ product.stok }}</div>
           <div class="mt-4 prose max-w-none" v-html="formattedDescription"></div>
           <div class="mt-6 flex space-x-3">
-            <button class="px-6 h-11 bg-[#03AC0E] text-white font-semibold rounded-full shadow-sm hover:bg-[#029a0c] transition" @click="addToCart">+ Keranjang</button>
-            <button class="px-6 h-11 bg-white text-[#03AC0E] border border-[#03AC0E] font-semibold rounded-full hover:bg-green-50 transition">Beli Sekarang</button>
+            <button class="btn-primary" @click="addToCart">Tambah ke Keranjang</button>
+            <button class="btn-secondary">Beli Sekarang</button>
           </div>
         </div>
       </div>
