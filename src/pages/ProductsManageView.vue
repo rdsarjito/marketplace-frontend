@@ -58,7 +58,7 @@
           <input v-model="form.harga_konsumen" type="number" class="input-field" placeholder="Harga konsumen" />
           <input v-model.number="form.stok" type="number" class="input-field" placeholder="Stok" />
           <textarea v-model="form.deskripsi" rows="3" class="input-field" placeholder="Deskripsi"></textarea>
-          <input v-model.number="form.id_toko" type="number" class="input-field" placeholder="ID Toko" />
+          <!-- ID Toko di-set otomatis dari API getMyShop; field disembunyikan -->
           <select v-model.number="form.id_category" class="input-field">
             <option :value="0">Pilih Kategori</option>
             <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.nama }}</option>
