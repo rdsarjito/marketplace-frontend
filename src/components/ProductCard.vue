@@ -11,7 +11,7 @@
     </div>
     <div class="mt-3 grid grid-cols-2 gap-2">
       <RouterLink class="btn-secondary py-2 text-sm text-center" :to="`/products/${product.id}`">Detail</RouterLink>
-      <button class="btn-primary py-2 text-sm" @click="onAddToCart">+ Keranjang</button>
+      <button class="w-full h-10 bg-[#03AC0E] text-white font-semibold rounded-full shadow-sm hover:bg-[#029a0c] transition" @click="onAddToCart">+ Keranjang</button>
     </div>
   </div>
 
