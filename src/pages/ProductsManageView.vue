@@ -34,7 +34,11 @@
               </div>
               <div class="flex gap-2 pt-1">
                 <button class="btn-secondary" @click="edit(p)">Edit</button>
-                <button class="text-red-600 text-sm" @click="del(p.id)">Hapus</button>
+                <button class="text-red-600 hover:text-red-700 p-1" @click="del(p.id)" title="Hapus" aria-label="Hapus">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                    <path d="M9 3.75A2.25 2.25 0 0 1 11.25 1.5h1.5A2.25 2.25 0 0 1 15 3.75V4.5h3.75a.75.75 0 0 1 0 1.5h-.39l-1.02 13.005A3 3 0 0 1 14.35 22.5H9.65a3 3 0 0 1-2.99-3.495L5.64 6H5.25a.75.75 0 0 1 0-1.5H9V3.75Zm1.5.75h3V3.75a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75V4.5Zm-2.86 1.5 1.01 12.9a1.5 1.5 0 0 0 1.49 1.35h4.7a1.5 1.5 0 0 0 1.49-1.35l1.01-12.9H7.64Z"/>
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
