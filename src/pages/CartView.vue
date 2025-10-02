@@ -14,7 +14,7 @@
               <div class="text-gray-600 text-sm">{{ formatIDR(it.harga) }}</div>
               <div class="mt-2 inline-flex items-center border rounded">
                 <button class="px-2 py-1" @click="dec(it.id)">-</button>
-                <input class="w-12 text-center py-1" type="number" min="1" :value="it.qty" @change="onQtyChange(it.id, $event)" />
+                <input class="w-12 text-c enter py-1" type="number" min="1" :value="it.qty" @change="onQtyChange(it.id, $event)" />
                 <button class="px-2 py-1" @click="inc(it.id)">+</button>
               </div>
             </div>
@@ -27,7 +27,7 @@
       </div>
       <div class="bg-white rounded-xl shadow p-4 h-fit">
         <h2 class="text-lg font-semibold mb-3">Ringkasan</h2>
-        <div class="flex justify-between text-gray-700 mb-2">
+        <div class="flex justify-between text-gray-700 mb-2"> 
           <span>Subtotal</span>
           <span>{{ formatIDR(subtotal) }}</span>
         </div>
