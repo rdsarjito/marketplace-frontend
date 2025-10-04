@@ -118,8 +118,11 @@ router.beforeEach((to, from, next) => {
     // Token exists but user is not authenticated - likely expired
     // Clear the expired token and redirect to login
     authStore.logout()
-    next('/login')
-    return
+    // Only redirect if not already going to login page to prevent infinite loop
+    if (to.path !== '/login') {
+      next('/login')
+      return
+    }
   }
   
   if (to.meta.requiresAuth && !isAuthenticated) {
