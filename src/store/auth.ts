@@ -60,8 +60,23 @@ export const useAuthStore = defineStore('auth', () => {
     const storedUser = localStorage.getItem('user')
     
     if (storedToken && storedUser) {
-      token.value = storedToken
-      user.value = JSON.parse(storedUser)
+      try {
+        // Check if token is expired by parsing JWT payload
+        const tokenPayload = JSON.parse(atob(storedToken.split('.')[1]))
+        const currentTime = Math.floor(Date.now() / 1000)
+        
+        if (tokenPayload.exp && tokenPayload.exp < currentTime) {
+          // Token is expired, clear auth data
+          logout()
+          return
+        }
+        
+        token.value = storedToken
+        user.value = JSON.parse(storedUser)
+      } catch (error) {
+        // Invalid token format, clear auth data
+        logout()
+      }
     }
   }
 

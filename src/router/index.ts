@@ -112,6 +112,16 @@ router.beforeEach((to, from, next) => {
   
   const isAuthenticated = authStore.isAuthenticated
   
+  // Check if token exists but user is not authenticated (token might be expired)
+  const token = localStorage.getItem('token')
+  if (token && !isAuthenticated) {
+    // Token exists but user is not authenticated - likely expired
+    // Clear the expired token and redirect to login
+    authStore.logout()
+    next('/login')
+    return
+  }
+  
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login')
   } else if (to.meta.requiresGuest && isAuthenticated) {

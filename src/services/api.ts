@@ -46,6 +46,10 @@ class ApiService {
       const data = await response.json()
 
       if (!response.ok) {
+        // Handle 401 Unauthorized - token expired
+        if (response.status === 401) {
+          this.handleTokenExpiration()
+        }
         throw new Error(data.message || 'Something went wrong')
       }
 
@@ -53,6 +57,17 @@ class ApiService {
     } catch (error) {
       console.error('API Error:', error)
       throw error
+    }
+  }
+
+  private handleTokenExpiration() {
+    // Clear stored auth data
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    
+    // Redirect to login page
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login'
     }
   }
 

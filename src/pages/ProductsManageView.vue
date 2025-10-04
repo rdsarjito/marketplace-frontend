@@ -44,35 +44,9 @@
           </div>
         </div>
         <div v-if="totalPages > 1" class="flex items-center justify-center gap-2 mt-4">
-          <button
-            class="px-4 h-10 rounded-lg border text-sm text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-            :disabled="page===1"
-            @click="page = Math.max(1, page - 1)"
-          >
-            <span class="-ml-1">‹</span>
-            Previous
-          </button>
-
-          <template v-for="it in visiblePages" :key="`p-${it}`">
-            <span v-if="it==='...'" class="px-2 text-gray-400">...</span>
-            <button
-              v-else
-              class="h-10 min-w-[40px] px-3 rounded-lg text-sm transition border"
-              :class="Number(it)===page ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-900 hover:bg-gray-50'"
-              @click="page = Number(it)"
-            >
-              {{ it }}
-            </button>
-          </template>
-
-          <button
-            class="px-4 h-10 rounded-lg border text-sm text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-            :disabled="page===totalPages"
-            @click="page = Math.min(totalPages, page + 1)"
-          >
-            Next
-            <span class="-mr-1">›</span>
-          </button>
+          <button class="btn-secondary" :disabled="page===1" @click="page = page - 1">Sebelumnya</button>
+          <div class="text-sm text-gray-600">Halaman {{ page }} / {{ totalPages }}</div>
+          <button class="btn-secondary" :disabled="page===totalPages" @click="page = page + 1">Berikutnya</button>
         </div>
       </div>
       <div class="bg-white rounded-xl shadow p-4">
@@ -217,28 +191,6 @@ const totalPages = computed(() => Math.max(1, Math.ceil(filteredProducts.value.l
 const paginatedProducts = computed(() => {
   const start = (page.value - 1) * perPage.value
   return filteredProducts.value.slice(start, start + perPage.value)
-})
-
-// Build numbered pagination with ellipses, e.g., 1 ... 4 5 [6] 7 8 ... 13
-const visiblePages = computed<(number|string)[]>(() => {
-  const total = totalPages.value
-  const current = page.value
-  const pages: (number|string)[] = []
-  if (total <= 7) {
-    for (let i = 1; i <= total; i++) pages.push(i)
-    return pages
-  }
-  const pushRange = (start: number, end: number) => {
-    for (let i = start; i <= end; i++) pages.push(i)
-  }
-  pages.push(1)
-  const left = Math.max(2, current - 1)
-  const right = Math.min(total - 1, current + 1)
-  if (left > 2) pages.push('...')
-  pushRange(left, right)
-  if (right < total - 1) pages.push('...')
-  pages.push(total)
-  return pages
 })
 
 const updateStock = async (p: any) => {
