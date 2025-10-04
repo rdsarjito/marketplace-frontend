@@ -101,7 +101,7 @@
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '@/store/cart'
 import Toast from '@/components/Toast.vue'
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { apiService, resolveAssetUrl } from '@/services/api'
 import { useAuthStore } from '@/store/auth'
@@ -233,7 +233,20 @@ const logout = () => {
 }
 
 onMounted(() => {
-  loadCategories()
+  // Only load categories if user is authenticated to prevent 401 loops
+  if (auth.isAuthenticated) {
+    loadCategories()
+  }
+})
+
+// Watch for authentication changes to load categories when user logs in
+watch(() => auth.isAuthenticated, (isAuth) => {
+  if (isAuth) {
+    loadCategories()
+  } else {
+    // Clear categories when user logs out
+    categories.value = []
+  }
 })
 
 // Close on outside click
