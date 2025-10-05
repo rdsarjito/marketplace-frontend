@@ -119,6 +119,7 @@
         <button
           type="button"
           class="mt-6 w-full btn-secondary flex items-center justify-center space-x-3"
+          @click="loginWithGoogle"
         >
           <svg class="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -156,12 +157,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import type { LoginRequest } from '@/types/auth'
+import { API_BASE_URL, apiService } from '@/services/api'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const form = reactive<LoginRequest>({
@@ -184,4 +187,34 @@ const handleLogin = async () => {
     error.value = err.message || 'Login failed'
   }
 }
+
+const loginWithGoogle = () => {
+  // Redirect to backend Google OAuth endpoint
+  window.location.href = `${API_BASE_URL}/auth/google`
+}
+
+onMounted(async () => {
+  // Handle token from Google OAuth callback
+  const token = route.query.token as string | undefined
+  if (token) {
+    try {
+      // Persist token then fetch profile
+      localStorage.setItem('token', token)
+      authStore.token = token as any
+      const profile = await apiService.getUserProfile()
+      const user = profile.data
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user))
+        // @ts-ignore set directly is fine in Pinia setup store
+        authStore.user = user
+      }
+      router.replace('/dashboard')
+    } catch (e: any) {
+      // Cleanup on failure
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      error.value = e?.message || 'Google login failed'
+    }
+  }
+})
 </script>
