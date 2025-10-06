@@ -13,6 +13,7 @@ import OrdersView from '@/pages/OrdersView.vue'
 import OrderDetailView from '@/pages/OrderDetailView.vue'
 import ProfileView from '@/pages/ProfileView.vue'
 import ProductsManageView from '@/pages/ProductsManageView.vue'
+import CategoriesManageView from '@/pages/CategoriesManageView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -98,6 +99,12 @@ const router = createRouter({
       path: '/orders/:id',
       name: 'order-detail',
       component: OrderDetailView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/categories',
+      name: 'categories',
+      component: CategoriesManageView,
       meta: { requiresAuth: true }
     }
   ]

@@ -139,6 +139,26 @@ class ApiService {
     return this.request('/category')
   }
 
+  async createCategory(payload: { nama: string }): Promise<ApiResponse<any>> {
+    return this.request('/category', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async updateCategory(id: number | string, payload: { nama: string }): Promise<ApiResponse<any>> {
+    return this.request(`/category/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async deleteCategory(id: number | string): Promise<ApiResponse<any>> {
+    return this.request(`/category/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
   async getProductDetail(idOrSlug: string | number): Promise<ApiResponse<ProductItem>> {
     return this.request<ProductItem>(`/product/${idOrSlug}`)
   }
