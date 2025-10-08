@@ -78,6 +78,7 @@
             <button @click.stop="onShopClick" class="h-10 px-3 rounded-lg border text-sm hover:border-[#03AC0E]">Toko</button>
             <div v-show="openShop" class="absolute right-0 z-40 mt-2 w-44 bg-white border rounded-lg shadow p-2 transition ease-in-out duration-200" :class="openShop ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'">
               <RouterLink to="/my-products" class="block px-2 py-1 text-sm rounded hover:bg-gray-50">Produk Saya</RouterLink>
+              <RouterLink to="/categories" class="block px-2 py-1 text-sm rounded hover:bg-gray-50">Kategori</RouterLink>
             </div>
           </div>
 
