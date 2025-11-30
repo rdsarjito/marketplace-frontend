@@ -65,6 +65,40 @@
             </label>
           </div>
         </div>
+
+        <div class="bg-white rounded-xl shadow p-4">
+          <h2 class="text-lg font-semibold mb-3">Metode Pembayaran</h2>
+          <div class="space-y-2">
+            <label class="flex items-center gap-3 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+              <input type="radio" value="COD" v-model="paymentMethod" />
+              <div>
+                <div class="font-medium">Cash on Delivery (COD)</div>
+                <div class="text-sm text-gray-600">Bayar saat barang diterima</div>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+              <input type="radio" value="virtual_account" v-model="paymentMethod" />
+              <div>
+                <div class="font-medium">Virtual Account</div>
+                <div class="text-sm text-gray-600">Transfer via Virtual Account (BCA, BNI, Mandiri)</div>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+              <input type="radio" value="e_wallet" v-model="paymentMethod" />
+              <div>
+                <div class="font-medium">E-Wallet</div>
+                <div class="text-sm text-gray-600">GoPay, OVO, DANA, LinkAja</div>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+              <input type="radio" value="bank_transfer" v-model="paymentMethod" />
+              <div>
+                <div class="font-medium">Bank Transfer</div>
+                <div class="text-sm text-gray-600">Transfer Bank (BCA, BNI, Mandiri)</div>
+              </div>
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="bg-white rounded-xl shadow p-4 h-fit">
@@ -129,6 +163,7 @@ const shippingMethod = ref<'REG' | 'YES'>('REG')
 const shippingCost = computed(() => 20000)
 const shippingCostFast = computed(() => 40000)
 const selectedShippingCost = computed(() => shippingMethod.value === 'YES' ? shippingCostFast.value : shippingCost.value)
+const paymentMethod = ref<string>('COD')
 const total = computed(() => subtotal.value + selectedShippingCost.value)
 const canPlaceOrder = computed(() => {
   const hasItems = items.value.length > 0
@@ -242,13 +277,27 @@ const ensureAddressAndPlaceOrder = async () => {
 
   const trxPayload = {
     harga_total: subtotal.value,
-    method_bayar: 'COD',
+    method_bayar: paymentMethod.value,
     id_alamat: idAlamat,
     detail_trx
   }
 
   try {
-    await apiService.createTransaction(trxPayload)
+    const response = await apiService.createTransaction(trxPayload)
+    const transaction = response.data
+
+    // If payment method is not COD, redirect to payment URL
+    if (paymentMethod.value !== 'COD' && transaction?.payment_url) {
+      // Save transaction ID to localStorage for tracking
+      if (transaction?.id) {
+        localStorage.setItem('pending_transaction_id', String(transaction.id))
+      }
+      // Redirect to Midtrans payment page
+      window.location.href = transaction.payment_url
+      return
+    }
+
+    // For COD, clear cart and redirect to orders
     cart.clear()
     successMsg.value = 'Pesanan berhasil dibuat.'
     useToastStore().success('Pesanan berhasil dibuat')
