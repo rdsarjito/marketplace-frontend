@@ -11,6 +11,7 @@ import CartView from '@/pages/CartView.vue'
 import CheckoutView from '@/pages/CheckoutView.vue'
 import OrdersView from '@/pages/OrdersView.vue'
 import OrderDetailView from '@/pages/OrderDetailView.vue'
+import PaymentStatusView from '@/pages/PaymentStatusView.vue'
 import ProfileView from '@/pages/ProfileView.vue'
 import ProductsManageView from '@/pages/ProductsManageView.vue'
 import CategoriesManageView from '@/pages/CategoriesManageView.vue'
@@ -99,6 +100,12 @@ const router = createRouter({
       path: '/orders/:id',
       name: 'order-detail',
       component: OrderDetailView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/payment/:id',
+      name: 'payment-status',
+      component: PaymentStatusView,
       meta: { requiresAuth: true }
     },
     {

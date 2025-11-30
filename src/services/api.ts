@@ -261,6 +261,12 @@ class ApiService {
   async getOrderDetail(id: number | string): Promise<ApiResponse<any>> {
     return this.request(`/trx/${id}`)
   }
+
+  async checkPaymentStatus(id: number | string): Promise<ApiResponse<any>> {
+    return this.request(`/trx/${id}/check-payment`, {
+      method: 'POST',
+    })
+  }
 }
 
 export const apiService = new ApiService(API_BASE_URL)

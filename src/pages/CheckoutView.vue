@@ -286,14 +286,12 @@ const ensureAddressAndPlaceOrder = async () => {
     const response = await apiService.createTransaction(trxPayload)
     const transaction = response.data
 
-    // If payment method is not COD, redirect to payment URL
-    if (paymentMethod.value !== 'COD' && transaction?.payment_url) {
+    // If payment method is not COD, redirect to payment status page first
+    if (paymentMethod.value !== 'COD' && transaction?.id) {
       // Save transaction ID to localStorage for tracking
-      if (transaction?.id) {
-        localStorage.setItem('pending_transaction_id', String(transaction.id))
-      }
-      // Redirect to Midtrans payment page
-      window.location.href = transaction.payment_url
+      localStorage.setItem('pending_transaction_id', String(transaction.id))
+      // Redirect to payment status page (which will handle redirect to Midtrans)
+      router.push(`/payment/${transaction.id}`)
       return
     }
 
