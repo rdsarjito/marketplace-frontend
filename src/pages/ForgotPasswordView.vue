@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <div class="text-center">
-        <h2 class="text-3xl font-bold text-[#03AC0E] mb-2">Evermos</h2>
+        <h2 class="text-3xl font-bold text-[#03AC0E] mb-2">Warung Budeh Ramah</h2>
         <h3 class="text-2xl font-bold text-gray-900">Lupa Password</h3>
         <p class="mt-2 text-sm text-gray-600">
           Masukkan email Anda untuk mendapatkan link reset password
@@ -120,11 +120,11 @@ const submitForgotPassword = async () => {
       successMessage.value = response.message || 'Link reset password telah dikirim ke email Anda'
       form.value.email = ''
     } else {
-      toast.showToast(response.message || 'Terjadi kesalahan', 'error')
+      toast.error(response.message || 'Terjadi kesalahan')
     }
   } catch (error: any) {
     console.error('Forgot password error:', error)
-    toast.showToast('Terjadi kesalahan saat mengirim link reset password', 'error')
+    toast.error('Terjadi kesalahan saat mengirim link reset password')
   } finally {
     loading.value = false
   }

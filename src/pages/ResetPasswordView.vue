@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <div class="text-center">
-        <h2 class="text-3xl font-bold text-[#03AC0E] mb-2">Evermos</h2>
+        <h2 class="text-3xl font-bold text-[#03AC0E] mb-2">Warung Budeh Ramah</h2>
         <h3 class="text-2xl font-bold text-gray-900">Reset Password</h3>
         <p class="mt-2 text-sm text-gray-600">
           Masukkan password baru Anda

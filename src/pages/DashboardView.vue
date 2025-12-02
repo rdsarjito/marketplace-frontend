@@ -1,21 +1,22 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div class="px-4 py-6 sm:px-0">
-        
-
-        
-
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <div class="space-y-8">
         <!-- Kategori Pilihan -->
-        <div class="mb-8">
-          <h3 class="text-2xl font-bold text-gray-900 mb-4">Kategori Pilihan</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <section aria-labelledby="kategori-pilihan-heading">
+          <h3
+            id="kategori-pilihan-heading"
+            class="text-xl sm:text-2xl font-bold text-gray-900 mb-4"
+          >
+            Kategori Pilihan
+          </h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <button
               v-for="cat in categories"
               :key="cat.id"
               type="button"
-              class="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center transition-transform duration-200 ease-out hover:shadow-md hover:scale-105"
+              class="bg-white border border-gray-200 rounded-lg shadow-sm p-3 sm:p-4 flex flex-col items-center transition-transform duration-200 ease-out hover:shadow-md hover:scale-[1.02] sm:hover:scale-105"
               @click="goToCategory(cat)"
             >
               <div class="w-full aspect-square overflow-hidden rounded-md border border-gray-100 mb-3 flex items-center justify-center bg-white">
@@ -33,34 +34,41 @@
               </div>
             </button>
           </div>
-        </div>
+        </section>
 
         <!-- User Info Card -->
-        <div class="card">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">Your Information</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-500">Name</label>
-              <p class="mt-1 text-sm text-gray-900">{{ user?.nama }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-500">Email</label>
-              <p class="mt-1 text-sm text-gray-900">{{ user?.email }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-500">Phone</label>
-              <p class="mt-1 text-sm text-gray-900">{{ user?.no_telp }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-500">Job</label>
-              <p class="mt-1 text-sm text-gray-900">{{ user?.pekerjaan }}</p>
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-500">About</label>
-              <p class="mt-1 text-sm text-gray-900">{{ user?.tentang }}</p>
+        <section aria-labelledby="user-info-heading">
+          <div class="card">
+            <h3
+              id="user-info-heading"
+              class="text-lg sm:text-xl font-medium text-gray-900 mb-4"
+            >
+              Informasi Akun
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Name</label>
+                <p class="mt-1 text-sm text-gray-900">{{ user?.nama }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Email</label>
+                <p class="mt-1 text-sm text-gray-900">{{ user?.email }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Phone</label>
+                <p class="mt-1 text-sm text-gray-900">{{ user?.no_telp }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Job</label>
+                <p class="mt-1 text-sm text-gray-900">{{ user?.pekerjaan }}</p>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-500">About</label>
+                <p class="mt-1 text-sm text-gray-900">{{ user?.tentang }}</p>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   </div>

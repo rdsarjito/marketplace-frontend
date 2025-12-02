@@ -4,7 +4,11 @@
       <!-- Login Form Card -->
       <div class="card">
         <div class="text-center">
-          <h2 class="text-3xl font-bold text-gray-900 mb-8">Login</h2>
+          <img
+            src="@/assets/warung_budeh_ramah.svg"
+            alt="Warung Budeh Ramah"
+            class="mx-auto h-32 w-auto mb-8 sm:h-40"
+          />
         </div>
 
         <form @submit.prevent="handleLogin" class="space-y-6">
