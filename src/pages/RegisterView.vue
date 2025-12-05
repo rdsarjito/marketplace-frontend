@@ -275,8 +275,8 @@ const form = reactive<RegisterRequest>({
 
 const showPassword = ref(false)
 const error = ref('')
-const provinces = ref([])
-const cities = ref([])
+const provinces = ref<{ id: number; name: string }[]>([])
+const cities = ref<{ id: number; name: string }[]>([])
 
 const { isLoading } = authStore
 

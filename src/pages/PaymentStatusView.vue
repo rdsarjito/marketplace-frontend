@@ -17,9 +17,17 @@
         <div v-else-if="transaction" class="space-y-6">
           <!-- Payment Status Badge -->
           <div class="text-center">
-            <div v-if="paymentStatus === 'paid'" class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-4">
-              <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            <div v-if="paymentStatus === 'paid'" class="success-check-container inline-flex items-center justify-center w-20 h-20 mb-4 relative">
+              <!-- Shadow Effect -->
+              <div class="success-shadow absolute inset-0 rounded-full bg-green-200 opacity-0"></div>
+              <!-- Animated Circle Background -->
+              <svg class="success-circle absolute inset-0 w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle class="circle-stroke" cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="3"/>
+                <circle class="circle-fill" cx="50" cy="50" r="45" fill="#10b981" opacity="0"/>
+              </svg>
+              <!-- Animated Checkmark -->
+              <svg class="success-checkmark w-12 h-12 text-white relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path class="checkmark-path" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
               </svg>
             </div>
             <div v-else-if="paymentStatus === 'expired'" class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-4">
@@ -518,4 +526,132 @@ onUnmounted(() => {
   }
 })
 </script>
+
+<style scoped>
+.success-check-container {
+  animation: containerScale 3.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+.success-shadow {
+  animation: shadowPulse 3.5s ease-out infinite;
+}
+
+.success-circle {
+  transform-origin: center;
+  animation: circleScale 3.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+.circle-stroke {
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  animation: circleStrokeDraw 3.5s ease-out infinite;
+}
+
+.circle-fill {
+  animation: circleFill 3.5s ease-out infinite;
+}
+
+.success-checkmark {
+  animation: checkmarkFadeIn 3.5s ease-out infinite;
+}
+
+.checkmark-path {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  animation: checkmarkDraw 3.5s ease-out infinite;
+}
+
+@keyframes containerScale {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  21.4% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  42.9% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shadowPulse {
+  0%, 42.9% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  21.4% {
+    transform: scale(1.2);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes circleScale {
+  0%, 42.9% {
+    transform: scale(1);
+  }
+  21.4% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes circleStrokeDraw {
+  0% {
+    stroke-dashoffset: 283;
+    opacity: 0;
+  }
+  5.7% {
+    opacity: 1;
+  }
+  21.4% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  42.9%, 100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes circleFill {
+  0%, 14.3% {
+    opacity: 0;
+  }
+  21.4%, 42.9%, 100% {
+    opacity: 1;
+  }
+}
+
+@keyframes checkmarkFadeIn {
+  0%, 14.3% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-10deg);
+  }
+  21.4%, 42.9%, 100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes checkmarkDraw {
+  0%, 14.3% {
+    stroke-dashoffset: 20;
+  }
+  21.4%, 42.9%, 100% {
+    stroke-dashoffset: 0;
+  }
+}
+</style>
 

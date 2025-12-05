@@ -3,7 +3,6 @@ import type { ProductItem } from '@/types/product'
 
 export const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://127.0.0.1:8080/api/v1'
 export const API_ORIGIN = API_BASE_URL.split('/api/')[0]
-
 export function resolveAssetUrl(path?: string): string {
   if (!path) return ''
   if (path.startsWith('http')) return path
@@ -196,14 +195,19 @@ class ApiService {
     })
   }
 
-  async updateProduct(id: number | string, payload: {
+  async updateProduct(
+    id: number | string,
+    payload: Partial<{
     nama_produk: string
     harga_reseller: string
     harga_konsumen: string
     stok: number
     deskripsi: string
     id_category: number
-  }): Promise<ApiResponse<ProductItem>> {
+      is_active: boolean
+      status: string
+    }>
+  ): Promise<ApiResponse<ProductItem>> {
     return this.request<ProductItem>(`/product/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),

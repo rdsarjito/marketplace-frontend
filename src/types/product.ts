@@ -25,6 +25,9 @@ export interface ProductItem {
   harga_konsumen: string
   stok: number
   deskripsi: string
+  // Optional status fields for activation state
+  is_active?: boolean
+  status?: string
   created_at?: string
   updated_at?: string
   id_toko?: number
