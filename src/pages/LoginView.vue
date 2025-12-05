@@ -1,15 +1,17 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
+      <!-- Logo - Outside Card -->
+      <div class="text-center">
+        <img
+          src="@/assets/warung_budeh_ramah.svg"
+          alt="Warung Budeh Ramah"
+          class="mx-auto h-24 w-auto sm:h-28"
+        />
+      </div>
+      
       <!-- Login Form Card -->
       <div class="card">
-        <div class="text-center">
-          <img
-            src="@/assets/warung_budeh_ramah.svg"
-            alt="Warung Budeh Ramah"
-            class="mx-auto h-32 w-auto mb-8 sm:h-40"
-          />
-        </div>
 
         <form @submit.prevent="handleLogin" class="space-y-6">
           <!-- Email Field -->

@@ -219,11 +219,6 @@
             </select>
           </div>
 
-          <!-- Error Message -->
-          <div v-if="error" class="text-red-600 text-sm text-center">
-            {{ error }}
-          </div>
-
           <!-- Register Button -->
           <button
             type="submit"
@@ -274,7 +269,6 @@ const form = reactive<RegisterRequest>({
 })
 
 const showPassword = ref(false)
-const error = ref('')
 const provinces = ref<{ id: number; name: string }[]>([])
 const cities = ref<{ id: number; name: string }[]>([])
 
@@ -308,14 +302,21 @@ const loadCities = async () => {
 }
 
 const handleRegister = async () => {
-  error.value = ''
-  
   try {
     await authStore.register(form)
     toast.success('Akun berhasil dibuat. Silakan login.')
     router.push('/login')
   } catch (err: any) {
-    error.value = err.message || 'Registration failed'
+    const errorMessage = err.message || 'Registration failed'
+    
+    // Show toast with specific error message
+    if (errorMessage.includes('Email sudah terdaftar')) {
+      toast.error('Email sudah terdaftar. Silakan gunakan email lain atau login dengan email tersebut.')
+    } else if (errorMessage.includes('Nomor telepon sudah terdaftar')) {
+      toast.error('Nomor telepon sudah terdaftar. Silakan gunakan nomor telepon lain.')
+    } else {
+      toast.error(errorMessage)
+    }
   }
 }
 
