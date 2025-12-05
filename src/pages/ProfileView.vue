@@ -241,7 +241,7 @@
         </div>
 
         <!-- Filter (only all addresses) -->
-        <div class="flex gap-2">
+            <div class="flex gap-2">
           <button
             class="px-4 py-2 rounded-lg border text-sm font-medium transition-colors border-[#03AC0E] text-[#03AC0E] bg-green-50"
             disabled
