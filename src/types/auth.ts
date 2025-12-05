@@ -28,6 +28,9 @@ export interface User {
   id_provinsi: string;
   id_kota: string;
   is_admin: boolean;
+  photo_url?: string;
+  avatar?: string;
+  picture?: string;
 }
 
 export interface AuthResponse {

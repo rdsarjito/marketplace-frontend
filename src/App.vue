@@ -5,9 +5,14 @@
         <!-- Kiri: Logo (truncate di mobile) -->
         <RouterLink
           to="/dashboard"
-          class="text-[#03AC0E] font-semibold text-base sm:text-lg truncate max-w-[40vw] sm:max-w-none"
+          class="flex items-center gap-2 text-[#03AC0E] font-semibold text-base sm:text-lg truncate max-w-[40vw] sm:max-w-none"
         >
-          Warung Budeh Ramah
+          <img
+            src="@/assets/warung_budeh_ramah.svg"
+            alt="Warung Budeh Ramah"
+            class="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0"
+          />
+          <span class="truncate">Warung Budeh Ramah</span>
         </RouterLink>
 
         <!-- Tengah: Kategori + Search -->
@@ -123,7 +128,7 @@
           <div class="relative hidden sm:block" ref="shopRef" @mouseenter="onShopEnter" @mouseleave="onShopLeave">
             <button
               @click.stop="onShopClick"
-              class="h-10 px-2 sm:px-3 rounded-lg border text-xs sm:text-sm hover:border-[#03AC0E]"
+              class="h-10 px-2 sm:px-3 rounded-lg text-xs sm:text-sm hover:bg-gray-50"
             >
               Toko
             </button>
@@ -137,13 +142,98 @@
           <div class="relative hidden sm:block" ref="profileRef" @mouseenter="onProfileEnter" @mouseleave="onProfileLeave">
             <button
               @click.stop="onProfileClick"
-              class="h-10 px-2 sm:px-3 rounded-lg border text-xs sm:text-sm hover:border-[#03AC0E]"
+              class="h-10 px-2 sm:px-3 rounded-lg text-xs sm:text-sm hover:bg-gray-50 flex items-center gap-2"
             >
-              Profile
+              <div class="w-9 h-9 rounded-full bg-gray-100 border overflow-hidden flex items-center justify-center text-white font-semibold">
+                <img
+                  v-if="userAvatarUrl"
+                  :src="userAvatarUrl"
+                  alt="Avatar"
+                  class="w-full h-full object-cover"
+                  @error="onAvatarError"
+                />
+                <span v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#03AC0E] to-emerald-500">
+                  {{ userInitial }}
+                </span>
+              </div>
+              <div class="hidden sm:flex flex-col items-start">
+                <span class="text-sm font-semibold text-gray-900 truncate max-w-[120px]">{{ userName }}</span>
+                <span class="text-xs text-gray-500 truncate max-w-[120px]">{{ userEmailOrPhone }}</span>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+              </svg>
             </button>
-            <div v-show="openProfile" class="absolute right-0 z-40 mt-2 w-44 bg-white border rounded-lg shadow p-2 transition ease-in-out duration-200" :class="openProfile ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'">
-              <RouterLink to="/profile" class="block px-2 py-1 text-sm rounded hover:bg-gray-50">Lihat Profil</RouterLink>
-              <button class="block w-full text-left px-2 py-1 text-sm rounded hover:bg-gray-50 text-red-600" @click="logout">Logout</button>
+            <div
+              v-show="openProfile"
+              class="absolute right-0 z-40 mt-2 w-80 bg-white border rounded-xl shadow-lg p-3 transition ease-in-out duration-200"
+              :class="openProfile ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'"
+            >
+              <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
+                <div class="w-12 h-12 rounded-full bg-gray-100 border overflow-hidden flex items-center justify-center text-white text-lg font-semibold">
+                  <img
+                    v-if="userAvatarUrl"
+                    :src="userAvatarUrl"
+                    alt="Avatar"
+                    class="w-full h-full object-cover"
+                    @error="onAvatarError"
+                  />
+                  <span v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#03AC0E] to-emerald-500">
+                    {{ userInitial }}
+                  </span>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-base font-semibold text-gray-900 truncate">{{ userName }}</div>
+                  <div class="text-sm text-gray-500 truncate">{{ userEmailOrPhone }}</div>
+                </div>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-2">
+                <RouterLink to="/orders" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50">
+                  <span class="w-8 h-8 inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m-.75-13.5h-4.5A2.25 2.25 0 007.5 4.75v14.5A2.25 2.25 0 009.75 21.5h4.5A2.25 2.25 0 0016.5 19.25V4.75A2.25 2.25 0 0014.25 2.5z" />
+                    </svg>
+                  </span>
+                  <span class="text-sm font-medium text-gray-900">Pembelian</span>
+                </RouterLink>
+                <RouterLink to="/cart" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50">
+                  <span class="w-8 h-8 inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h13.5m-10.5-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
+                  </span>
+                  <span class="text-sm font-medium text-gray-900">Keranjang</span>
+                </RouterLink>
+                <RouterLink to="/my-products" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50">
+                  <span class="w-8 h-8 inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5h16.5M4.5 7.5A1.5 1.5 0 003 9v7.5A1.5 1.5 0 004.5 18h15a1.5 1.5 0 001.5-1.5V9a1.5 1.5 0 00-1.5-1.5M9 7.5V6a3 3 0 013-3 3 3 0 013 3v1.5" />
+                    </svg>
+                  </span>
+                  <span class="text-sm font-medium text-gray-900">Produk Saya</span>
+                </RouterLink>
+                <RouterLink to="/profile" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50">
+                  <span class="w-8 h-8 inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.938a3 3 0 014.812 0l.295.401a2.25 2.25 0 001.691.86l.5.022a3 3 0 012.85 3.65l-.114.49a2.25 2.25 0 00.505 1.99l.343.396a3 3 0 01-.21 4.24l-.386.35a2.25 2.25 0 00-.7 2.074l.106.487a3 3 0 01-3.223 3.645l-.497-.063a2.25 2.25 0 00-1.962.75l-.33.384a3 3 0 01-4.542 0l-.33-.384a2.25 2.25 0 00-1.962-.75l-.498.063a3 3 0 01-3.222-3.645l.105-.487a2.25 2.25 0 00-.699-2.074l-.386-.35a3 3 0 01-.21-4.24l.343-.396a2.25 2.25 0 00.505-1.99l-.114-.49a3 3 0 012.85-3.65l.5-.022a2.25 2.25 0 001.69-.86l.296-.401z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.88 9h4.24M9.88 12.25h4.24M9.88 15.5h2.62" />
+                    </svg>
+                  </span>
+                  <span class="text-sm font-medium text-gray-900">Pengaturan</span>
+                </RouterLink>
+              </div>
+
+              <div class="mt-3 pt-3 border-t">
+                <button
+                  class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 font-medium"
+                  @click="logout"
+                >
+                  <span>Keluar</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 12h9m0 0l-3-3m3 3l-3 3" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -265,6 +355,7 @@ const selectedCategoryId = ref<number | null>(route.query.category_id ? Number(r
 const openCat = ref(false)
 const openShop = ref(false)
 const openProfile = ref(false)
+const avatarError = ref(false)
 const openCart = ref(false)
 const notifCount = ref(2)
 const msgCount = ref(1)
@@ -371,6 +462,17 @@ const submitSearch = () => {
   router.push({ path: '/products', query: { q: q.value || undefined, category_id: selectedCategoryId.value || undefined } })
 }
 const auth = useAuthStore()
+const userName = computed(() => auth.user?.nama || 'Pengguna')
+const userEmailOrPhone = computed(() => auth.user?.email || auth.user?.no_telp || 'Akun saya')
+const userInitial = computed(() => (userName.value?.[0] || 'U').toUpperCase())
+const userAvatarUrl = computed(() => {
+  if (avatarError.value) return ''
+  const raw = (auth.user as any)?.photo_url || (auth.user as any)?.picture || (auth.user as any)?.avatar || ''
+  if (!raw) return ''
+  if (typeof raw === 'string' && raw.startsWith('http')) return raw
+  return resolveAssetUrl(raw)
+})
+const onAvatarError = () => { avatarError.value = true }
 const logout = () => {
   auth.logout()
   openProfile.value = false
