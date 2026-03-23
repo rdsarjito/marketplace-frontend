@@ -250,6 +250,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import type { RegisterRequest } from '@/types/auth'
 import { useToastStore } from '@/store/toast'
+import { API_BASE_URL } from '@/services/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -276,7 +277,7 @@ const { isLoading } = authStore
 
 const loadProvinces = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8080/api/v1/provcity/listprovincies')
+    const response = await fetch(`${API_BASE_URL}/provcity/listprovincies`)
     const data = await response.json()
     provinces.value = data.data
   } catch (err) {
@@ -292,7 +293,7 @@ const loadCities = async () => {
   }
 
   try {
-    const response = await fetch(`http://127.0.0.1:8080/api/v1/provcity/listcities/${form.id_provinsi}`)
+    const response = await fetch(`${API_BASE_URL}/provcity/listcities/${form.id_provinsi}`)
     const data = await response.json()
     cities.value = data.data
     form.id_kota = ''

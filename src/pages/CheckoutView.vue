@@ -134,7 +134,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { apiService } from '@/services/api'
+import { apiService, API_BASE_URL } from '@/services/api'
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '@/store/cart'
 import SkeletonList from '@/components/SkeletonList.vue'
@@ -192,7 +192,7 @@ const addressSummary = computed(() => {
 const formatIDR = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 
 const loadProvinces = async () => {
-  const res = await fetch('http://127.0.0.1:8080/api/v1/provcity/listprovincies')
+  const res = await fetch(`${API_BASE_URL}/provcity/listprovincies`)
   const data = await res.json()
   provinces.value = data.data || []
 }
@@ -216,7 +216,7 @@ const toggleNewAddress = () => {
 
 const loadCities = async () => {
   if (!form.value.id_provinsi) { cities.value = []; form.value.id_kota = ''; return }
-  const res = await fetch(`http://127.0.0.1:8080/api/v1/provcity/listcities/${form.value.id_provinsi}`)
+  const res = await fetch(`${API_BASE_URL}/provcity/listcities/${form.value.id_provinsi}`)
   const data = await res.json()
   cities.value = data.data || []
 }
@@ -240,7 +240,7 @@ const ensureAddressAndPlaceOrder = async () => {
     }
     const hasError = Object.values(validationErrors.value).some(Boolean)
     if (hasError) { placing.value = false; return }
-    const addressRes = await fetch('http://127.0.0.1:8080/api/v1/user/alamat', {
+    const addressRes = await fetch(`${API_BASE_URL}/user/alamat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
