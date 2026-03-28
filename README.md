@@ -1,39 +1,38 @@
-# marketplace-frontend
+# 🛒 marketplace-frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Frontend untuk aplikasi marketplace yang dibangun menggunakan **Vue 3 + Vite + TypeScript**. Project ini dirancang untuk performa tinggi, scalable, dan developer-friendly.
 
-## Recommended IDE Setup
+---
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 🚀 Tech Stack
 
-## Type Support for `.vue` Imports in TS
+- **Vue 3**
+- **Vite**
+- **TypeScript**
+- **ESLint**
+- **Volar**
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+---
 
-## Customize configuration
+## 🧑‍💻 Recommended IDE Setup
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+Gunakan:
 
-## Project Setup
+- VSCode
+- Extension:
+  - Volar (WAJIB)
+  - Disable Vetur
 
-```sh
+---
+
+## 📦 TypeScript & `.vue` Support
+
+- Gunakan `vue-tsc` untuk type checking
+- Gunakan Volar agar `.vue` terbaca dengan baik di editor
+
+---
+
+## ⚙️ Project Setup
+
+```bash
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
